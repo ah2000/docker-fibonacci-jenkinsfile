@@ -1,7 +1,7 @@
 [![](https://images.microbadger.com/badges/image/hoto/jenkinsfile-examples.svg)](https://microbadger.com/images/hoto/jenkinsfile-examples "Get your own image badge on microbadger.com")
 # Jenkinsfiles lamdba test deployment Examples
 
-Extension of hoto/jenkins-example to unit test and deploy a python package 
+Extension of hoto/jenkins-example to unit test and deploy a python lambda package and test on apigateway 
 ![](./.images/001.png)
 
 ### Why
