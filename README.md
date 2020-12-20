@@ -1,9 +1,7 @@
 [![](https://images.microbadger.com/badges/image/hoto/jenkinsfile-examples.svg)](https://microbadger.com/images/hoto/jenkinsfile-examples "Get your own image badge on microbadger.com")
-# Jenkinsfiles Examples
+# Jenkinsfiles lamdba test deployment Examples
 
-Collection of executable Jenkinsfiles loaded automatically into a dockerized Jenkins.
-Useful for experimenting or demos.
-
+Extension of hoto/jenkins-example to unit test and deploy a python package 
 ![](./.images/001.png)
 
 ### Why
@@ -14,21 +12,18 @@ Unfortunately the best way to test a Jenkinsfile is to run it in a Jenkins insta
 This project takes away the manual process of copying and pasting a Jenkinsfile into a Jenkins job configuration.
 By design job has to be run manually.
 
-### How it works
+### Dependencies
 
 [jenkinsfile-loader](https://github.com/hoto/jenkinsfile-loader) container uses Jenkins REST API to create Jenkins jobs directly from Jenkinsfiles located in `jenkinsfiles` directory.
 It also monitors any change in that folder and will update, create or remove jobs accordingly.  
 All files must be named `<job_name>.groovy` where `<job_name>` will be used for the Jenkins job name.
 There is no auto-refresh, so after adding or removing files Jenkins page needs to be refreshed manually to reflect changes.
 
-### Blogs using this repository:
-
-* [Creating a Jenkinsfile pipeline](https://medium.com/@AndrzejRehmann/creating-a-jenkinsfile-pipeline-7aefc89b8c67)
-* [Private Jenkins Shared Libraries](https://medium.com/@AndrzejRehmann/private-jenkins-shared-libraries-540abe7a0ab7)
-
 ### Run
 
 This will pull and start latest docker images
+
+ensure you have copied or set a symbolic link from your .aws to uses default profile on AWS commands
 
     docker-compose pull
     docker-compose up
@@ -57,38 +52,15 @@ To stop press `CTRL+C` in terminal.
 
 To remove all containers with all of its data run:
 
-    docker-compoes down
+    docker-compose down
 
 ---
 
-### Updating Jenkins
-
-If you wish to update jenkins for some reason then:
-
-1. Update jenkins version in `Dockerfile`
-2. Rebuild docker image and start a new jenkins container.
-3. Manually update jenkins plugins using the `Install or update Jenkins plugins` guide.
-
-### Install or update Jenkins plugins
-
-If you just want to test new plugins without committing them to git then stop at step 2.
-
-1. Start jenkins container.
-2. Manually install or update plugins through the UI.
-3. Restart jenkins to verify it's still working.
-4. Copy output of the following command to `plugins.txt` file (located in this repository):
-
-        curl -s http://localhost:8080/pluginManager/api/json?depth=1 \
-          | jq -r '.plugins[] | "\(.shortName):\(.version)"' \
-          | sort
-    
-5. Rebuild docker image and start a new containers to verify new plugins have been installed:
-
-        docker-compose build
-        docker-compose down
-        docker-compose up
         
 ### Components:
-  - [jenkins](https://hub.docker.com/_/jenkins/) - Customized with pre-installed plugins and disabled authentication.
+  - [terraform] - for deploying 
+  - [sonarqube] - for doing static security testing
+  - [pylint] - for python linting of code
+  - [jenkins](https://hub.docker.com/_/jenkins/ ) - Customized with pre-installed plugins and disabled authentication.
   - [jenkinsfile-loader](https://github.com/hoto/jenkinsfile-loader) - Uses Jenkins API and creates jobs directly from Jenkinsfiles.
   
