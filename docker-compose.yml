@@ -9,8 +9,8 @@ services:
         - AWS_ACCESS_KEY_ID
         - AWS_SECRET_ACCESS_KEY
         - AWS_DEFAULT_REGION
-        - AWS_TERRAFORM_STATE_BUCKET
-        - RELEASE_BUCKET_NAME
+        - BUCKET_TERRAFORM_STATE
+        - BUCKET_RELEASE
     build: .
     ports:
     - target: 8080

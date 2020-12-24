@@ -45,7 +45,7 @@ source ${tmp_dir}/venv/bin/activate
 source ${tmp_env_file}
 #get the package dependencies for this test and install them
 DEPPACKAGES=$(echo ${LIBPACKS} | sed -e 's/;/ /g')
-${tmp_dir}/venv/bin/pip3 install ${PACKAGE} ${DEPPACKAGES} 
+${tmp_dir}/venv/bin/pip3 install ${PACKAGE} ${DEPPACKAGES} >/dev/null
 ${tmp_dir}/venv/bin/python3 $tmp_dir/venv/lib/python3.6/site-packages/${PACKAGE} ${OPTIONS} ${SCANPATH} 2>${tmp_dir}/${PACKAGE}Error.log 1>${tmp_dir}/${PACKAGE}Out.log
 PACKAGEExit=$?
 echo "dumping ${PACKAGE} Error:"

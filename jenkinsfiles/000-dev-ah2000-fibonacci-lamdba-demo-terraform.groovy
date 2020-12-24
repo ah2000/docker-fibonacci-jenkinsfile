@@ -1,7 +1,27 @@
 node {
-    environment {
-        CURRENT_WORKSPACE = pwd()
-    }
+   stage ('Check Environment Vars Passed')
+   {
+     //ensure the environment variables needed to run the terraform and aws cli commands have been passed
+     env.CHECK_BUCKET_TERRAFROM_STATE_ENV = sh (returnStdout: true, script: 'echo \$BUCKET_TERRAFORM_STATE').trim() 
+     if ("$CHECK_BUCKET_TERRAFROM_STATE_ENV" == "") { error "BUCKET_TERRAFORM_STATE must be set in ENV" }
+     env.CHECK_AWS_ACCESS_KEY_ID = sh (returnStdout: true, script: 'echo \$AWS_ACCESS_KEY_ID').trim() 
+     if ("$CHECK_AWS_ACCESS_KEY_ID" == "") { error "AWS_ACCESS_KEY_ID must be set in ENV" }
+     env.CHECK_AWS_SECRET_ACCESS_KEY = sh (returnStdout: true, script: 'echo \$AWS_SECRET_ACCESS_KEY').trim() 
+     if ("$CHECK_AWS_SECRET_ACCESS_KEY" == "") { error "AWS_SECRET_ACCESS_KEY must be set in ENV" }
+     env.CHECK_AWS_DEFAULT_REGION = sh (returnStdout: true, script: 'echo \$AWS_DEFAULT_REGION').trim() 
+     if ("$CHECK_AWS_DEFAULT_REGION" == "") { error "AWS_DEFAULT_REGION must be set in ENV" }
+
+   }
+   stage ('Set TF Variables from Environment  ')
+   {
+        env.TF_VAR_tf_state_bucket = sh (returnStdout: true, script: 'echo \$BUCKET_TERRAFORM_STATE').trim()
+        env.TF_VAR_aws_region = sh (returnStdout: true, script: 'echo \$AWS_DEFAULT_REGION').trim()
+        //TODO these should be parameters which are passed in to the Job 
+        env.TF_VAR_application = "ah2000-lambda-test"
+        env.TF_VAR_environment = "dev"
+     
+         sh "echo \"bucket=$TF_VAR_tf_state_bucket region=$TF_VAR_aws_region key=$TF_VAR_application/$TF_VAR_environment\""
+   }
    stage ('Cleanup Workspace') {
        
         env.WORKSPACE = pwd()
@@ -22,6 +42,23 @@ node {
    }
    stage('TruffleHog') {
        
-         sh "${env.JENKINS_HOME}/bin/pythonPackageScan.sh -p=truffleHog3 -s=${env.WORKSPACE} -o=\"--no-entropy\" -e"
+         sh "${env.JENKINS_HOME}/bin/pythonPackageScan.sh -p=truffleHog3 -s=${env.WORKSPACE} -o=\"--no-history\" -e"
    }
+   stage('Build zip') {
+       env.TF_VAR_releasezipfile = "${env.WORKSPACE}/${commitID()}.zip"
+       sh "cd python_src && zip -D ${TF_VAR_releasezipfile} *.py"
+   }
+   stage('terraform') {
+       
+         sh "cd terraform_src && terraform init -backend-config \"bucket=${TF_VAR_tf_state_bucket}\" -backend-config \"region=${TF_VAR_aws_region}\" -backend-config \"key=${TF_VAR_application}/${TF_VAR_environment}\""
+         sh "cd terraform_src && terraform plan"
+         sh "cd terraform_src && terraform apply --auto-approve"
+   }
+}
+
+def commitID() {
+
+    def commitID = sh (returnStdout: true, script:'git rev-parse HEAD').trim()
+    commitID
+
 }
