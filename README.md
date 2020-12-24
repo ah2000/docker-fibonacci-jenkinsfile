@@ -23,10 +23,16 @@ There is no auto-refresh, so after adding or removing files Jenkins page needs t
 
 This will pull and start latest docker images
 
-ensure you have copied or set a symbolic link from your .aws to uses default profile on AWS commands
+ensure you have copied or exported the variables eg 
+export AWS_ACCESS_KEY_ID=XXXXXXXXXXXXXXXXXXXX
+						 
+export AWS_SECRET_ACCESS_KEY=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxx
+export AWS_DEFAULT_REGION=eu-west-2
+export BUCKET_TERRAFORM_STATE=cloudyro-dev-state
 
-    docker-compose pull
-    docker-compose up
+
+    docker-compose build
+    docker-compose up 
    
 If you have problem with mounting `/var/run/docker.sock` then remove it from `docker-compose.yml` but you won't be able to run jobs which use docker as an agent.
 
@@ -48,6 +54,16 @@ Wait for Jenkins to boot up. Authentication is disabled. Open a browser and go t
     
 If you don't see any jobs refresh the browser and check the `docker-compose` logs.
 
+This should create two jenkins jobs
+
+000-fail-ah2000-fibonacci-lamdba-demo-terraform
+ -- this job effectively pulls the build from https://github.com/ah2000/fibonacci-lambda-apigateway-demo branch feature/lambda1 and tests and deploys based on the AWS_ACCESS variables given and BUCKET_TERRAFORM_STATE 
+000-dev-ah2000-fibonacci-lamdba-demo-terraform
+ -- this job effectively pulls the build from https://github.com/ah2000/fibonacci-lambda-apigateway-demo branch feature/brokenTruffleHoff and fails on TruffleHoff as the project has with FAKE and inactive access keys  
+
+The other jobs are from the base project this was forked from
+ 
+--- 
 To stop press `CTRL+C` in terminal.  
 
 To remove all containers with all of its data run:
@@ -59,8 +75,7 @@ To remove all containers with all of its data run:
         
 ### Components:
   - [terraform] - for deploying 
-  - [sonarqube] - for doing static security testing
-  - [pylint] - for python linting of code
+  - [virtualenv] - for running python packages in isolation
   - [jenkins](https://hub.docker.com/_/jenkins/ ) - Customized with pre-installed plugins and disabled authentication.
   - [jenkinsfile-loader](https://github.com/hoto/jenkinsfile-loader) - Uses Jenkins API and creates jobs directly from Jenkinsfiles.
   
