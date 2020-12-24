@@ -23,13 +23,12 @@ There is no auto-refresh, so after adding or removing files Jenkins page needs t
 
 This will pull and start latest docker images
 
-ensure you have copied or exported the variables eg 
-export AWS_ACCESS_KEY_ID=XXXXXXXXXXXXXXXXXXXX
-						 
-export AWS_SECRET_ACCESS_KEY=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxx
-export AWS_DEFAULT_REGION=eu-west-2
-export BUCKET_TERRAFORM_STATE=cloudyro-dev-state
-
+ensure you have copied or exported the variables eg:
+ 
+    export AWS_ACCESS_KEY_ID=XXXXXXXXXXXXXXXXXXXX
+    export AWS_SECRET_ACCESS_KEY=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxx
+    export AWS_DEFAULT_REGION=eu-west-2
+    export BUCKET_TERRAFORM_STATE=terraform-state-bucket-name
 
     docker-compose build
     docker-compose up 
