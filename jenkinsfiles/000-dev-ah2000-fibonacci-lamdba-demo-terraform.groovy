@@ -54,6 +54,13 @@ node {
          sh "cd terraform_src && terraform plan"
          sh "cd terraform_src && terraform apply --auto-approve"
    }
+   stage('apigateway End point Call')
+   {
+       env.RESOURCE_ID = sh (returnStdout: true, script :'echo \$(cd terraform_src && terraform state show module.hello_post.aws_api_gateway_method.request_method | grep resource_id | tr -d \'[:space:]\' | cut -d= -f2 | tr -d \'\"\')').trim()
+       env.API_ID = sh (returnStdout: true, script :'echo \$(cd terraform_src && terraform state show module.hello_post.aws_api_gateway_method.request_method | grep rest_api_id | tr -d \'[:space:]\' | cut -d= -f2 | tr -d \'\"\')').trim()
+       writeFile(file: 'echo.json', text: '{ \"fibparam\" : 10 }')
+       sh ("aws apigateway test-invoke-method --rest-api-id $API_ID --resource-id $RESOURCE_ID --http-method POST --path-with-query-string \"\" --body file://echo.json")
+   }
 }
 
 def commitID() {
